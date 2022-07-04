@@ -1,3 +1,6 @@
+import tabJoursEnOrdre from './Utilitaire/gestionTemps.js';
+//console.log(tabJoursEnOrdre);
+
 const CLEAPI = 'aa05ae0e2d44f6d46b4f2d0365786107';
 let resultatsAPI;
 
@@ -6,6 +9,10 @@ const temperature = document.querySelector('.temperature');
 const localisation = document.querySelector('.localisation');
 const heure = document.querySelectorAll('.heure-nom-prevision');
 const tempPourH = document.querySelectorAll('.heure-prevision-valeur');
+const jourDiv = document.querySelectorAll('.jour-prevision-nom');
+const tempJoursDiv = document.querySelectorAll('.jour-prevision-temps');
+const imgIcone = document.querySelector('.logo-meteo');
+const chargementContainer = document.querySelector('.overlay-icone-chargement');
 
 if (navigator.geolocation) {
   navigator.geolocation.getCurrentPosition(
@@ -32,7 +39,7 @@ function appelAPI(long, lat) {
       return response.json();
     })
     .then((data) => {
-      console.log(data);
+      //console.log(data);
       resultatsAPI = data;
 
       temps.innerText = resultatsAPI.current.weather[0].description;
@@ -62,5 +69,28 @@ function appelAPI(long, lat) {
           resultatsAPI.hourly[j * 3 + 3].temp
         )}°`;
       }
+
+      // trois premiéres lettres des jours
+
+      for (let k = 0; k < tabJoursEnOrdre.length; k++) {
+        jourDiv[k].innerText = tabJoursEnOrdre[k].slice(0, 3);
+      }
+
+      // temp par jour
+
+      for (let m = 0; m < 7; m++) {
+        tempJoursDiv[m].innerText = `${Math.trunc(
+          resultatsAPI.daily[m + 1].temp.day
+        )}°`;
+      }
+
+      // Icone dynamique
+      if (heureActuelle >= 6 && heureActuelle < 21) {
+        imgIcone.src = `ressources/jour/${resultatsAPI.current.weather[0].icon}.svg`;
+      } else {
+        imgIcone.src = `ressources/nuit/${resultatsAPI.current.weather[0].icon}.svg`;
+      }
+
+      chargementContainer.classList.add('disparition');
     });
 }
